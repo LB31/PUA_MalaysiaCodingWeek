@@ -13,6 +13,7 @@ public class ARPlacer : MonoBehaviour
 
     // Buttons
     [SerializeField] private GameObject buttonPlacement;
+    [SerializeField] private GameObject buttonRestart;
 
     private ARRaycastManager raycastManager;
     private ARPlaneManager planeManager;
@@ -29,13 +30,38 @@ public class ARPlacer : MonoBehaviour
 
         startPointRay = new Vector2(Screen.width * 0.5f, Screen.height * 0.3f);
 
-        actualObject.SetActive(false);
-        placementIndicator.SetActive(false);
+        TogglePlacement(true);
     }
 
     private void Update()
     {
         PlaneDragging();
+    }
+
+    private void PlaneDragging()
+    {
+        // Check if AR plane was hit
+        if (raycastManager.Raycast(startPointRay, hits, TrackableType.PlaneWithinPolygon))
+        {
+            // Show indicator again
+            placementIndicator.SetActive(true);
+
+            // Get hit position
+            Pose hitPose = hits[0].pose;
+
+            placementIndicator.transform.SetPositionAndRotation(hitPose.position, hitPose.rotation);
+        } else
+            placementIndicator.SetActive(false);
+    }
+
+    public void PlaceObject()
+    {
+        FinishPlacement();
+        TogglePlacement(false);
+
+        actualObject.transform.position = placementIndicator.transform.position;
+
+
     }
 
     private void FinishPlacement()
@@ -61,33 +87,21 @@ public class ARPlacer : MonoBehaviour
         }
     }
 
-    private void PlaneDragging()
+    private void TogglePlacement(bool activatePlacement)
     {
-        // Check if AR plane was hit
-        if (raycastManager.Raycast(startPointRay, hits, TrackableType.PlaneWithinPolygon))
-        {
-            // Show indicator again
-            placementIndicator.SetActive(true);
+        buttonPlacement.SetActive(activatePlacement);
+        buttonRestart.SetActive(!activatePlacement);
 
-            // Get hit position
-            Pose hitPose = hits[0].pose;
-
-            placementIndicator.transform.SetPositionAndRotation(hitPose.position, hitPose.rotation);
-        } else
-            placementIndicator.SetActive(false);
+        placementIndicator.SetActive(activatePlacement);
+        actualObject.SetActive(!activatePlacement);
     }
 
-    public void PlaceObject()
+    public void RestartPlacing()
     {
-        FinishPlacement();
-
-        buttonPlacement.SetActive(false);
-
-        actualObject.transform.position = placementIndicator.transform.position;
-
-        placementIndicator.SetActive(false);
-        actualObject.SetActive(true);
-
+        TogglePlacement(true);
+        TogglePlanes(true);
     }
+
+
 
 }
