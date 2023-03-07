@@ -7,13 +7,16 @@ using UnityEngine.XR.ARSubsystems;
 public class ARPlacer : MonoBehaviour
 {
     [HideInInspector] public UnityEvent PlacementFinished;
-    [SerializeField] private GameObject placementObject;
+
+    [SerializeField] private GameObject actualObject;
+    [SerializeField] private GameObject placementIndicator;
+
+    // Buttons
+    [SerializeField] private GameObject buttonPlacement;
 
     private ARRaycastManager raycastManager;
-    private ARAnchorManager anchorManager;
     private ARPlaneManager planeManager;
 
-    private GameObject placementIndicator;
     // From where to shoot on the tracked planes
     private Vector2 startPointRay;
     // Current plane hits
@@ -22,10 +25,12 @@ public class ARPlacer : MonoBehaviour
     private void Awake()
     {
         raycastManager = GetComponent<ARRaycastManager>();
-        anchorManager = GetComponent<ARAnchorManager>();
         planeManager = GetComponent<ARPlaneManager>();
 
         startPointRay = new Vector2(Screen.width * 0.5f, Screen.height * 0.3f);
+
+        actualObject.SetActive(false);
+        placementIndicator.SetActive(false);
     }
 
     private void Update()
@@ -61,37 +66,27 @@ public class ARPlacer : MonoBehaviour
         // Check if AR plane was hit
         if (raycastManager.Raycast(startPointRay, hits, TrackableType.PlaneWithinPolygon))
         {
+            // Show indicator again
+            placementIndicator.SetActive(true);
+
             // Get hit position
             Pose hitPose = hits[0].pose;
-            Vector3 pos = hitPose.position;
 
-            // Create new placement object
-            if (placementIndicator == null)
-            {
-                // Check if placement indicator was assigned
-                if (!placementObject)
-                {
-                    // Create substitute object
-                    placementObject = new GameObject("placementIndicator");
-                }
-                // Create actual placement indicator
-                placementIndicator = Instantiate(placementObject, pos, hitPose.rotation *= Quaternion.Euler(0, 0, 0));
-            }
-            // move placementIndicator
-            else
-            {
-                placementIndicator.transform.position = pos;
-                placementIndicator.transform.rotation = hitPose.rotation;
-
-                // Check if desired alignement e.g. ceiling, wall was hit
-                //if (CheckPlaneAlignment() && !CheckIfObjectsAround(pos))
-                //    PlaceObject();
-            }
-        }
+            placementIndicator.transform.SetPositionAndRotation(hitPose.position, hitPose.rotation);
+        } else
+            placementIndicator.SetActive(false);
     }
 
-    private void PlaceObject()
+    public void PlaceObject()
     {
+        FinishPlacement();
+
+        buttonPlacement.SetActive(false);
+
+        actualObject.transform.position = placementIndicator.transform.position;
+
+        placementIndicator.SetActive(false);
+        actualObject.SetActive(true);
 
     }
 
