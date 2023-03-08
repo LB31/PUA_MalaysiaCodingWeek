@@ -10,23 +10,18 @@ public class ColorChanger : MonoBehaviour
 {
     [HideInInspector] public bool islandIsActive = true;
 
-    [SerializeField] private Transform cameraTrans;
-    [SerializeField] private float radius = 1;
-    [SerializeField] private float secondsUntilShowingUI = 1;
+    [Header("Plants")]
     [SerializeField] private LayerMask plantLayer;
+    [SerializeField] private float secondsUntilShowingUI = 1;
     [SerializeField] private List<PlantData> plantsData = new();
 
-    [Header("old")]
+    [Header("Others")]
     [SerializeField] private MeshRenderer mesh;
+    [SerializeField] private Transform cameraTrans;
+    [SerializeField] private float radius = 1;
 
     float duration = 0;
     PlantData activePlant = new();
-
-    private void Start()
-    {
-        foreach (PlantData data in plantsData)
-            data.Button.onClick.AddListener(() => mesh.material.color = data.Color);
-    }
 
     private void FixedUpdate()
     {
@@ -52,22 +47,13 @@ public class ColorChanger : MonoBehaviour
 
         activePlant.PlantUI.SetActive(activate);
 
-        mesh.material.color = activate ? activePlant.Color : Color.black;
-    }
-
-    private void OnDestroy()
-    {
-        foreach (PlantData data in plantsData)
-        {
-            if (data.Button)
-                data.Button.onClick.RemoveAllListeners();
-        }
+        if (activate)
+            mesh.material.color = activePlant.Color;
     }
 }
 [Serializable]
 public struct PlantData
 {
     public Color Color;
-    public Button Button;
     public GameObject PlantUI;
 }
