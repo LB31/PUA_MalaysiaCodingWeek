@@ -12,7 +12,6 @@ public class IslandTransformer : MonoBehaviour
     public Transform target;
 
     //speficies distance moved and scaled when front object clicked
-    public Vector3 distanceChanged;
     public Vector3 scaleChanged;
 
     //declare original position of the selected object (front object)
@@ -44,14 +43,13 @@ public class IslandTransformer : MonoBehaviour
         {
             //declare the variable to store the selected object
             Transform hitObject = hit.transform;
+            //Set the original position so that the object at front could be move back to that position in the future
+            originPosition = hitObject.position;
 
             //if none is at front, selected object will move to front
             if (currentFrontObject == null)
             {
                 if (!hit.transform.CompareTag("Waiting")) return;
-
-                //Set the original position so that the object at front could be move back to that position in the future
-                originPosition = hitObject.position;
 
                 //starts the animation of the object to the front
                 StartCoroutine(MoveObject(hitObject));
@@ -72,9 +70,6 @@ public class IslandTransformer : MonoBehaviour
 
                     Vector3 tempPosition = originPosition;
 
-                    //Update the new original position
-                    originPosition = hit.transform.position;
-
                     //starts the animation of the swapping between the selected object and the front object
                     StartCoroutine(SwapObjects(hitObject, currentFrontObject, tempPosition));
 
@@ -88,29 +83,29 @@ public class IslandTransformer : MonoBehaviour
     }
 
     //move object to front
-    IEnumerator MoveObject(Transform objectPosition)
+    IEnumerator MoveObject(Transform objectToMove)
     {
         moving = true;
         //while the selected object is not at the front
-        while (!SamePositionApproximately(objectPosition.position, target.position))
+        while (!SamePositionApproximately(objectToMove.position, target.position))
         {
             float step = speed * Time.deltaTime; //calculate distance to move
-            objectPosition.position = Vector3.MoveTowards(objectPosition.position, target.position, step);
+            objectToMove.position = Vector3.MoveTowards(objectToMove.position, target.position, step);
 
             yield return null;
 
         }
-        currentFrontObject = objectPosition;
+        currentFrontObject = objectToMove;
         moving = false;
     }
 
     //swap object with the one at front
-    IEnumerator SwapObjects(Transform hitObj, Transform frontPosition, Vector3 returnPos)
+    IEnumerator SwapObjects(Transform hitObj, Transform frontObject, Vector3 returnPos)
     {
         moving = true;
         //while the selected object is not at the front nor the front object is not at its original position
         while (!SamePositionApproximately(hitObj.position, target.position) ||
-            !SamePositionApproximately(frontPosition.position, returnPos))
+            !SamePositionApproximately(frontObject.position, returnPos))
         {
             float step = speed * Time.deltaTime; //calculate distance to move
 
@@ -118,7 +113,7 @@ public class IslandTransformer : MonoBehaviour
             hitObj.position = Vector3.MoveTowards(hitObj.position, target.position, step);
 
             //the front object will move back to its original position
-            frontPosition.position = Vector3.MoveTowards(frontPosition.position, returnPos, step);
+            frontObject.position = Vector3.MoveTowards(frontObject.position, returnPos, step);
 
             yield return null;
 
@@ -128,12 +123,19 @@ public class IslandTransformer : MonoBehaviour
     }
 
     //open up the front object
-    IEnumerator SelectObject(Transform objectPosition)
+    IEnumerator SelectObject(Transform selectedObj)
     {
-        while (objectPosition.localScale.x < scaleChanged.x)
+        bool scaleUp = selectedObj.localScale.x > 1 ? false : true;
+        bool condition = true;
+
+        while (condition)
         {
-            //the front object will move back to its original position
-            objectPosition.localScale += objectPosition.localScale * Time.deltaTime;
+            condition = scaleUp ? selectedObj.localScale.x < scaleChanged.x : selectedObj.localScale.x > 1;
+
+            if (scaleUp)
+                selectedObj.localScale += Vector3.one * Time.deltaTime;
+            else
+                selectedObj.localScale -= Vector3.one * Time.deltaTime;
 
             yield return null;
         }
