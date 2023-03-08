@@ -2,18 +2,14 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Clickable : MonoBehaviour
+public class IslandTransformer : MonoBehaviour
 {
     //speed of the object
     public float speed = 6.0f;
+    public float movementThreshold = 0.1f;
 
     //the target position
     public Transform target;
-
-    //specify necessary object
-    public Transform ball1;
-    public Transform ball2;
-    public Transform ball3;
 
     //speficies distance moved and scaled when front object clicked
     public Vector3 distanceChanged;
@@ -58,20 +54,17 @@ public class Clickable : MonoBehaviour
                     originPosition = hit.transform.position;
 
                     //starts the animation of the object to the front
-                    StartCoroutine(moveObject(objectPosition));
+                    StartCoroutine(MoveObject(objectPosition));
 
                     //Set tags into 'Front' representing the object is at front
                     objectPosition.gameObject.tag = "Front";
 
                 }
             }
- 
+
             //if other object is selected, swap the object with the one at front
             else if (currentFrontObject != null)
             {
-                //swapping object
-                Debug.Log("Ready to Swap Object");
-
                 if (Physics.Raycast(ray, out RaycastHit hit))
                 {
                     Transform hitObject = hit.transform;
@@ -79,13 +72,9 @@ public class Clickable : MonoBehaviour
                     //Open Scene
                     if (hit.collider.CompareTag("Front"))
                     {
-                        Debug.Log("Front object selected, opening the scene");
-
                         Vector3 finalDistance = hitObject.position + distanceChanged;
 
-                        Debug.Log("distance: " + finalDistance);
-
-                        StartCoroutine(openObject(hitObject, finalDistance));
+                        StartCoroutine(OpenObject(hitObject, finalDistance));
 
                     }
                     else if (hit.collider.CompareTag("Waiting"))     //swappping object
@@ -97,10 +86,8 @@ public class Clickable : MonoBehaviour
                         //Update the new original position
                         originPosition = hit.transform.position;
 
-                        Debug.Log(originPosition);
-
                         //starts the animation of the swapping between the selected object and the front object
-                        StartCoroutine(swapObject(hitObject, currentFrontObject, tempPosition));
+                        StartCoroutine(SwapObjects(hitObject, currentFrontObject, tempPosition));
 
                         //Set tags into 'Front' representing the object is at front
                         hitObject.gameObject.tag = "Front";
@@ -123,11 +110,11 @@ public class Clickable : MonoBehaviour
     }
 
     //move object to front
-    IEnumerator moveObject(Transform objectPosition)
+    IEnumerator MoveObject(Transform objectPosition)
     {
         moving = true;
         //while the selected object is not at the front
-        while (objectPosition.position != target.position)
+        while (!SamePositionApproximately(objectPosition.position, target.position))
         {
             float step = speed * Time.deltaTime; //calculate distance to move
             objectPosition.position = Vector3.MoveTowards(objectPosition.position, target.position, step);
@@ -140,16 +127,17 @@ public class Clickable : MonoBehaviour
     }
 
     //swap object with the one at front
-    IEnumerator swapObject(Transform objectPosition, Transform frontPosition, Vector3 returnPos)
+    IEnumerator SwapObjects(Transform hitObj, Transform frontPosition, Vector3 returnPos)
     {
         moving = true;
         //while the selected object is not at the front nor the front object is not at its original position
-        while (objectPosition.position != target.position || frontPosition.position != returnPos)
+        while (!SamePositionApproximately(hitObj.position, target.position) ||
+            !SamePositionApproximately(frontPosition.position, returnPos))
         {
             float step = speed * Time.deltaTime; //calculate distance to move
 
             //the object selected will move to the front
-            objectPosition.position = Vector3.MoveTowards(objectPosition.position, target.position, step);
+            hitObj.position = Vector3.MoveTowards(hitObj.position, target.position, step);
 
             //the front object will move back to its original position
             frontPosition.position = Vector3.MoveTowards(frontPosition.position, returnPos, step);
@@ -157,18 +145,15 @@ public class Clickable : MonoBehaviour
             yield return null;
 
         }
-        currentFrontObject = objectPosition;
+        currentFrontObject = hitObj;
         moving = false;
     }
 
     //open up the front object
-    IEnumerator openObject(Transform objectPosition, Vector3 finalDistance)
+    IEnumerator OpenObject(Transform objectPosition, Vector3 finalDistance)
     {
         while (/*objectPosition.position != finalDistance || */objectPosition.localScale.x < scaleChanged.x)
         {
-            Debug.Log("obj: " + objectPosition.localScale.x);
-            Debug.Log("scale: " + scaleChanged.x);
-
             var step = speed * Time.deltaTime; //calculate distance to move
 
             //the object selected will move to the front
@@ -179,6 +164,14 @@ public class Clickable : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    private bool SamePositionApproximately(Vector3 a, Vector3 b)
+    {
+        if (Vector3.Distance(a, b) < movementThreshold)
+            return true;
+
+        return false;
     }
 
 }

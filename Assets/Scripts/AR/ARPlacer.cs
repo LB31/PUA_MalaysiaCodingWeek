@@ -63,9 +63,7 @@ public class ARPlacer : MonoBehaviour
         FinishPlacement();
         TogglePlacement(false);
 
-        actualObject.transform.position = placementIndicator.transform.position;
-
-
+        actualObject.transform.SetPositionAndRotation(placementIndicator.transform.position, placementIndicator.transform.rotation);
     }
 
     private void FinishPlacement()
