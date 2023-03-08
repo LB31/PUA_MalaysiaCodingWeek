@@ -15,6 +15,11 @@ public class Clickable : MonoBehaviour
     public Transform ball2;
     public Transform ball3;
 
+    //speficies distance moved and scaled when front object clicked
+    public Vector3 distanceChanged;
+    public Vector3 scaleChanged;
+
+
     //declare respective original object's position
     private Vector3 originBall1;
     private Vector3 originBall2;
@@ -29,6 +34,7 @@ public class Clickable : MonoBehaviour
         originBall1 = ball1.position;
         originBall2 = ball2.position;
         originBall3 = ball3.position;
+
     }
 
     private void Update()
@@ -73,7 +79,7 @@ public class Clickable : MonoBehaviour
                 }
             }
             //if the object is animating, do nothing
-            else if((ball1.position != originBall1 && ball2.position == originBall2 && ball3.position == originBall3 && ball1.position != target.position) ||
+            else if ((ball1.position != originBall1 && ball2.position == originBall2 && ball3.position == originBall3 && ball1.position != target.position) ||
                 (ball1.position == originBall1 && ball2.position != originBall2 && ball3.position == originBall3 && ball2.position != target.position) ||
                 (ball1.position == originBall1 && ball2.position == originBall2 && ball3.position != originBall3 && ball3.position != target.position)
                 )
@@ -81,7 +87,7 @@ public class Clickable : MonoBehaviour
                 Debug.Log("Object is moving, movement restricted.");
             }
             //if other object is selected, swap the object with the one at front
-            else if((ball1.position != originBall1 && ball2.position == originBall2 && ball3.position == originBall3) ||
+            else if ((ball1.position != originBall1 && ball2.position == originBall2 && ball3.position == originBall3) ||
                 (ball1.position == originBall1 && ball2.position != originBall2 && ball3.position == originBall3) ||
                 (ball1.position == originBall1 && ball2.position == originBall2 && ball3.position != originBall3))
             {
@@ -94,14 +100,26 @@ public class Clickable : MonoBehaviour
                 //end point of the ray
                 RaycastHit hit;
                 //runs if the ray hits
+
                 if (Physics.Raycast(ray, out hit))
                 {
                     Transform objectPosition = hit.transform;
-                   
-                    if(hit.collider.CompareTag("Front"))
+
+                    //Open Scene
+                    if (hit.collider.CompareTag("Front"))
                     {
-                        Debug.Log("object already at front");
-                    } else if(hit.collider.CompareTag("Waiting"))
+                        Debug.Log("Front object selected, opening the scene");
+
+                        Vector3 finalDistance = objectPosition.position + distanceChanged;
+
+                        Debug.Log("distance: " + finalDistance);
+
+                        StartCoroutine(openObject(objectPosition, finalDistance));
+
+
+
+                    }
+                    else if (hit.collider.CompareTag("Waiting"))     //swappping object
                     {
                         Debug.Log("swapping");
 
@@ -170,4 +188,25 @@ public class Clickable : MonoBehaviour
 
         }
     }
+
+    //open up the front object
+    IEnumerator openObject(Transform objectPosition, Vector3 finalDistance)
+    {
+        while (objectPosition.position != finalDistance || objectPosition.localScale.x < scaleChanged.x)
+        {
+            Debug.Log("obj: " + objectPosition.localScale.x);
+            Debug.Log("scale: " + scaleChanged.x);
+
+            var step = speed * Time.deltaTime; //calculate distance to move
+
+            //the object selected will move to the front
+            objectPosition.position = Vector3.MoveTowards(objectPosition.position, finalDistance, step);
+
+            //the front object will move back to its original position
+            objectPosition.localScale += objectPosition.localScale * 0.1f;
+
+            yield return null;
+        }
+    }
+
 }
