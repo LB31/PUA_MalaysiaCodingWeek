@@ -23,7 +23,6 @@ public class IslandTransformer : MonoBehaviour
     private Camera cam;
 
     private bool moving;
-    private bool open;
 
     private void Start()
     {
@@ -32,84 +31,60 @@ public class IslandTransformer : MonoBehaviour
 
     private void Update()
     {
-        //mouse clicked
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (moving) return;
-            if (open) return;
+        // return when not clicking
+        if (!Input.GetMouseButtonDown(0)) return;
+        // return when object is moving
+        if (moving) return;
 
-            //get the position of the mouse click and store in ray
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        //get the position of the mouse click and store in ray
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+
+        //runs if the ray hits
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            //declare the variable to store the selected object
+            Transform hitObject = hit.transform;
 
             //if none is at front, selected object will move to front
             if (currentFrontObject == null)
             {
-                //runs if the ray hits
-                if (Physics.Raycast(ray, out RaycastHit hit))
-                {
-                    if (!hit.transform.CompareTag("Waiting")) return;
+                if (!hit.transform.CompareTag("Waiting")) return;
 
-                    //declare the variable to store the selected object
-                    Transform objectPosition = hit.transform;
+                //Set the original position so that the object at front could be move back to that position in the future
+                originPosition = hitObject.position;
 
-                    //Set the original position so that the object at front could be move back to that position in the future
-                    originPosition = hit.transform.position;
+                //starts the animation of the object to the front
+                StartCoroutine(MoveObject(hitObject));
 
-                    //starts the animation of the object to the front
-                    StartCoroutine(MoveObject(objectPosition));
-
-                    //Set tags into 'Front' representing the object is at front
-                    objectPosition.gameObject.tag = "Front";
-
-                }
-            }
-
-            //if other object is selected, swap the object with the one at front
-            else if (currentFrontObject != null)
-            {
-                if (Physics.Raycast(ray, out RaycastHit hit))
-                {
-                    Transform hitObject = hit.transform;
-
-                    //Open Scene
-                    if (hit.collider.CompareTag("Front"))
-                    {
-                        Vector3 finalDistance = hitObject.position + distanceChanged;
-
-                        StartCoroutine(OpenObject(hitObject, finalDistance));
-
-                        open = true;
-                    }
-                    else if (hit.collider.CompareTag("Waiting"))     //swappping object
-                    {
-                        Debug.Log("swapping");
-
-                        Vector3 tempPosition = originPosition;
-
-                        //Update the new original position
-                        originPosition = hit.transform.position;
-
-                        //starts the animation of the swapping between the selected object and the front object
-                        StartCoroutine(SwapObjects(hitObject, currentFrontObject, tempPosition));
-
-                        //Set tags into 'Front' representing the object is at front
-                        hitObject.gameObject.tag = "Front";
-                        currentFrontObject.tag = "Waiting";
-                    }
-                }
-                else
-                {
-                    Debug.Log("Hit missed");
-                }
+                //Set tags into 'Front' representing the object is at front
+                hitObject.gameObject.tag = "Front";
             }
             else
             {
-                //invalid option as only at most one could be at front at a time
-                Debug.Log("Nothing happens");
+                //Open Scene
+                if (hit.collider.CompareTag("Front"))
+                {
+                    StartCoroutine(SelectObject(hitObject));
+                }
+                else if (hit.collider.CompareTag("Waiting"))     //swappping object
+                {
+                    Debug.Log("swapping");
+
+                    Vector3 tempPosition = originPosition;
+
+                    //Update the new original position
+                    originPosition = hit.transform.position;
+
+                    //starts the animation of the swapping between the selected object and the front object
+                    StartCoroutine(SwapObjects(hitObject, currentFrontObject, tempPosition));
+
+                    //Set tags into 'Front' representing the object is at front
+                    hitObject.gameObject.tag = "Front";
+                    currentFrontObject.tag = "Waiting";
+                }
             }
 
         }
-
     }
 
     //move object to front
@@ -153,17 +128,12 @@ public class IslandTransformer : MonoBehaviour
     }
 
     //open up the front object
-    IEnumerator OpenObject(Transform objectPosition, Vector3 finalDistance)
+    IEnumerator SelectObject(Transform objectPosition)
     {
-        while (/*objectPosition.position != finalDistance || */objectPosition.localScale.x < scaleChanged.x)
+        while (objectPosition.localScale.x < scaleChanged.x)
         {
-            var step = speed * Time.deltaTime; //calculate distance to move
-
-            //the object selected will move to the front
-            //objectPosition.position = Vector3.MoveTowards(objectPosition.position, finalDistance, step);
-
             //the front object will move back to its original position
-            objectPosition.localScale += objectPosition.localScale * 0.1f;
+            objectPosition.localScale += objectPosition.localScale * Time.deltaTime;
 
             yield return null;
         }
