@@ -27,6 +27,7 @@ public class Clickable : MonoBehaviour
     private Camera cam;
 
     private bool moving;
+    private bool open;
 
     private void Start()
     {
@@ -39,6 +40,7 @@ public class Clickable : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             if (moving) return;
+            if (open) return;
 
             //get the position of the mouse click and store in ray
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
@@ -87,6 +89,7 @@ public class Clickable : MonoBehaviour
 
                         StartCoroutine(openObject(hitObject, finalDistance));
 
+                        open = true;
                     }
                     else if (hit.collider.CompareTag("Waiting"))     //swappping object
                     {
