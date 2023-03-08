@@ -238,20 +238,20 @@ MonoBehaviour:
   islandIsActive: 1
   cameraTrans: {fileID: 801145825}
   radius: 1
-  secondsUntilShowingUI: 1
+  secondsUntilShowingUI: 3
   plantLayer:
     serializedVersion: 2
     m_Bits: 128
   plantsData:
   - Color: {r: 0.29411766, g: 0.078431375, b: 0.09019608, a: 0}
     Button: {fileID: 418437614}
-    plantUi: {fileID: 1906017903}
+    PlantUI: {fileID: 1906017903}
   - Color: {r: 0.59607846, g: 0.16078432, b: 0.18431373, a: 0}
     Button: {fileID: 371379411}
-    plantUi: {fileID: 1440437911}
+    PlantUI: {fileID: 1440437911}
   - Color: {r: 0.1607843, g: 0.25268948, b: 0.59607846, a: 0}
     Button: {fileID: 856248655}
-    plantUi: {fileID: 838642521}
+    PlantUI: {fileID: 838642521}
   mesh: {fileID: 1278119579}
 --- !u!4 &297027647
 Transform:
@@ -1352,7 +1352,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 801145822}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.37, y: 1, z: -1.11}
+  m_LocalPosition: {x: -3.37, y: -3.27, z: -1.11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
