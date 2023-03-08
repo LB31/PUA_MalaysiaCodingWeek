@@ -19,22 +19,18 @@ public class Clickable : MonoBehaviour
     public Vector3 distanceChanged;
     public Vector3 scaleChanged;
 
-
-    //declare respective original object's position
-    private Vector3 originBall1;
-    private Vector3 originBall2;
-    private Vector3 originBall3;
-
     //declare original position of the selected object (front object)
     private Vector3 originPosition;
 
+    public Transform currentFrontObject;
+
+    private Camera cam;
+
+    private bool moving;
+
     private void Start()
     {
-        //store respective original object's position
-        originBall1 = ball1.position;
-        originBall2 = ball2.position;
-        originBall3 = ball3.position;
-
+        cam = Camera.main;
     }
 
     private void Update()
@@ -42,33 +38,24 @@ public class Clickable : MonoBehaviour
         //mouse clicked
         if (Input.GetMouseButtonDown(0))
         {
-            /* 
-             Debug.Log("1: " + ball1.position + " " + originBall1);
-             Debug.Log("2: " + ball2.position + " " + originBall2);
-             Debug.Log("3: " + ball3.position + " " + originBall3);
-            */
+            if (moving) return;
+
+            //get the position of the mouse click and store in ray
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
             //if none is at front, selected object will move to front
-            if (ball1.position == originBall1 && ball2.position == originBall2 && ball3.position == originBall3)
+            if (currentFrontObject == null)
             {
-                Debug.Log("Nothing in front, move an object to front");
-
-                //get the position of the mouse click and store in ray variable
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                //end point of the ray
-                RaycastHit hit;
-
                 //runs if the ray hits
-                if (Physics.Raycast(ray, out hit))
+                if (Physics.Raycast(ray, out RaycastHit hit))
                 {
+                    if (!hit.transform.CompareTag("Waiting")) return;
+
                     //declare the variable to store the selected object
                     Transform objectPosition = hit.transform;
 
                     //Set the original position so that the object at front could be move back to that position in the future
                     originPosition = hit.transform.position;
-
-                    Debug.Log(originPosition);
 
                     //starts the animation of the object to the front
                     StartCoroutine(moveObject(objectPosition));
@@ -78,53 +65,32 @@ public class Clickable : MonoBehaviour
 
                 }
             }
-            //if the object is animating, do nothing
-            else if ((ball1.position != originBall1 && ball2.position == originBall2 && ball3.position == originBall3 && ball1.position != target.position) ||
-                (ball1.position == originBall1 && ball2.position != originBall2 && ball3.position == originBall3 && ball2.position != target.position) ||
-                (ball1.position == originBall1 && ball2.position == originBall2 && ball3.position != originBall3 && ball3.position != target.position)
-                )
-            {
-                Debug.Log("Object is moving, movement restricted.");
-            }
+ 
             //if other object is selected, swap the object with the one at front
-            else if ((ball1.position != originBall1 && ball2.position == originBall2 && ball3.position == originBall3) ||
-                (ball1.position == originBall1 && ball2.position != originBall2 && ball3.position == originBall3) ||
-                (ball1.position == originBall1 && ball2.position == originBall2 && ball3.position != originBall3))
+            else if (currentFrontObject != null)
             {
                 //swapping object
                 Debug.Log("Ready to Swap Object");
 
-                //get the position of the mouse click and store in ray
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                //end point of the ray
-                RaycastHit hit;
-                //runs if the ray hits
-
-                if (Physics.Raycast(ray, out hit))
+                if (Physics.Raycast(ray, out RaycastHit hit))
                 {
-                    Transform objectPosition = hit.transform;
+                    Transform hitObject = hit.transform;
 
                     //Open Scene
                     if (hit.collider.CompareTag("Front"))
                     {
                         Debug.Log("Front object selected, opening the scene");
 
-                        Vector3 finalDistance = objectPosition.position + distanceChanged;
+                        Vector3 finalDistance = hitObject.position + distanceChanged;
 
                         Debug.Log("distance: " + finalDistance);
 
-                        StartCoroutine(openObject(objectPosition, finalDistance));
-
-
+                        StartCoroutine(openObject(hitObject, finalDistance));
 
                     }
                     else if (hit.collider.CompareTag("Waiting"))     //swappping object
                     {
                         Debug.Log("swapping");
-
-                        //Get the object that is in front
-                        GameObject front = GameObject.FindWithTag("Front");
 
                         Vector3 tempPosition = originPosition;
 
@@ -134,11 +100,11 @@ public class Clickable : MonoBehaviour
                         Debug.Log(originPosition);
 
                         //starts the animation of the swapping between the selected object and the front object
-                        StartCoroutine(swapObject(objectPosition, front.transform, tempPosition));
+                        StartCoroutine(swapObject(hitObject, currentFrontObject, tempPosition));
 
                         //Set tags into 'Front' representing the object is at front
-                        objectPosition.gameObject.tag = "Front";
-                        front.tag = "Waiting";
+                        hitObject.gameObject.tag = "Front";
+                        currentFrontObject.tag = "Waiting";
                     }
                 }
                 else
@@ -159,40 +125,46 @@ public class Clickable : MonoBehaviour
     //move object to front
     IEnumerator moveObject(Transform objectPosition)
     {
+        moving = true;
         //while the selected object is not at the front
         while (objectPosition.position != target.position)
         {
-            var step = speed * Time.deltaTime; //calculate distance to move
+            float step = speed * Time.deltaTime; //calculate distance to move
             objectPosition.position = Vector3.MoveTowards(objectPosition.position, target.position, step);
 
             yield return null;
 
         }
+        currentFrontObject = objectPosition;
+        moving = false;
     }
 
     //swap object with the one at front
-    IEnumerator swapObject(Transform objectPosition, Transform frontPosition, Vector3 pos)
+    IEnumerator swapObject(Transform objectPosition, Transform frontPosition, Vector3 returnPos)
     {
+        moving = true;
         //while the selected object is not at the front nor the front object is not at its original position
-        while (objectPosition.position != target.position || frontPosition.position != pos)
+        while (objectPosition.position != target.position || frontPosition.position != returnPos)
         {
-            var step = speed * Time.deltaTime; //calculate distance to move
+            float step = speed * Time.deltaTime; //calculate distance to move
 
             //the object selected will move to the front
             objectPosition.position = Vector3.MoveTowards(objectPosition.position, target.position, step);
 
             //the front object will move back to its original position
-            frontPosition.position = Vector3.MoveTowards(frontPosition.position, pos, step);
+            frontPosition.position = Vector3.MoveTowards(frontPosition.position, returnPos, step);
 
             yield return null;
 
         }
+        currentFrontObject = objectPosition;
+        moving = false;
     }
 
     //open up the front object
     IEnumerator openObject(Transform objectPosition, Vector3 finalDistance)
     {
-        while (objectPosition.position != finalDistance || objectPosition.localScale.x < scaleChanged.x)
+        while (/*objectPosition.position != finalDistance || */objectPosition.localScale.x < scaleChanged.x)
         {
             Debug.Log("obj: " + objectPosition.localScale.x);
             Debug.Log("scale: " + scaleChanged.x);
@@ -200,7 +172,7 @@ public class Clickable : MonoBehaviour
             var step = speed * Time.deltaTime; //calculate distance to move
 
             //the object selected will move to the front
-            objectPosition.position = Vector3.MoveTowards(objectPosition.position, finalDistance, step);
+            //objectPosition.position = Vector3.MoveTowards(objectPosition.position, finalDistance, step);
 
             //the front object will move back to its original position
             objectPosition.localScale += objectPosition.localScale * 0.1f;
