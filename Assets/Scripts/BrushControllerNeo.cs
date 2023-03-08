@@ -6,10 +6,12 @@ public class BrushControllerNeo : MonoBehaviour
 {
     public Transform Brush;
     public GameObject ImageToSwipe;
+    public float radius = 2;
+    public string targetTag = "Target";
 
-    public Mesh mesh;
-    public Vector3[] vertices;
-    public Color[] colors;
+    private Mesh mesh;
+    private Vector3[] vertices;
+    private Color[] colors;
 
     void Start()
     {
@@ -29,37 +31,41 @@ public class BrushControllerNeo : MonoBehaviour
         // click
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("click");
         }
         // release
         if (Input.GetMouseButtonUp(0))
         {
-            Debug.Log("release");
         }
         // hold
         if (Input.GetMouseButton(0))
         {
-            Debug.Log("HOLD");
-
-            Vector3 hitPoint = Vector3.zero;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                Debug.Log(hit.transform.name);
+                if (!hit.transform.CompareTag(targetTag)) return;
 
                 Brush.SetPositionAndRotation(hit.point, hit.transform.rotation);
 
-                ReactToSwiping();
+                ReactToSwiping(hit);
             }
         }
     }
 
-    private void ReactToSwiping()
+    private void ReactToSwiping(RaycastHit hit)
     {
         for (int i = 0; i < vertices.Length; i++)
         {
-            colors[i].a -= 0.1f * Time.deltaTime;
+            Vector3 vertex = ImageToSwipe.transform.TransformPoint(vertices[i]);
+            float dist = Vector3.SqrMagnitude(vertex - hit.point);
+            float radiusSqr = radius * radius;
+            if (dist < radiusSqr)
+            {
+                float alpha = Mathf.Min(colors[i].a, dist / radiusSqr);
+                colors[i].a = alpha;
+            }          
         }
+
         mesh.colors = colors;
     }
+
 }
