@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -6,11 +7,11 @@ using UnityEngine.UI;
 
 public class OriginFlowConttoller : MonoBehaviour
 {
-    public GameObject[] content;
+    public List<Objects> content;
     public GameObject panel;
     public Button nextButton;
     public TextMeshProUGUI buttonText;
-    private int actualStep = -1;
+    private int actualStep = 0;
 
     private readonly string nextText = "Next";
     private readonly string restartText = "Restart";
@@ -25,32 +26,32 @@ public class OriginFlowConttoller : MonoBehaviour
     }
     private void ActivateContent()
     {
-        //activate button
-        if (nextButton.gameObject.activeSelf)
-            nextButton.gameObject.SetActive(true);
-
-        //Panel
-        if (!panel.activeSelf)
-            panel.SetActive(true);
-
-        //Avoid errors on the first step
-        if (actualStep != -1)
-        {
+        if (actualStep == 0)
             buttonText.text = nextText;
-            content[actualStep].SetActive(false);
-        }
+
+        //Deactivate current content
+        foreach (GameObject go in content[actualStep].ContentObjects)
+            go.SetActive(false);
 
         actualStep++;
 
         //Activate next content
-        content[actualStep].SetActive(true);
+        foreach (GameObject go in content[actualStep].ContentObjects)
+            go.SetActive(true);
 
-        if (actualStep + 1 >= content.Length)
+        if (actualStep + 1 >= content.Count)
             Restart();
     }
     private void Restart()
     {
-        actualStep = -1;
+        actualStep = 0;
         buttonText.text = restartText;
+    }
+
+    [Serializable]
+    public struct Objects
+    {
+        public List<GameObject> UIObjects;
+        public List<GameObject> ContentObjects;
     }
 }
