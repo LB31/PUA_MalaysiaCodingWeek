@@ -14,13 +14,21 @@ public class OriginFlowConttoller : MonoBehaviour
         nextButton.gameObject.SetActive(true);
         nextButton.onClick.AddListener(ActivateContent);
     }
+    private void OnDisable()
+    {
+        nextButton.onClick.RemoveAllListeners();
+    }
     private void ActivateContent()
     {
-        if(actualStep != -1)
+        if (actualStep != -1)
             content[actualStep].SetActive(false);
 
         actualStep++;
+
         content[actualStep].SetActive(true);
+
+        if (actualStep + 1 >= content.Length)
+            nextButton.gameObject.SetActive(false);
     }
 
 }
