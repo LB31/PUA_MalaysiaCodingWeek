@@ -17,7 +17,6 @@ public class OriginFlowConttoller : MonoBehaviour
 
     private void OnEnable()
     {
-        nextButton.gameObject.SetActive(true);
         nextButton.onClick.AddListener(ActivateContent);
     }
     private void OnDisable()
@@ -26,6 +25,10 @@ public class OriginFlowConttoller : MonoBehaviour
     }
     private void ActivateContent()
     {
+        //activate button
+        if (nextButton.gameObject.activeSelf)
+            nextButton.gameObject.SetActive(true);
+
         //Panel
         if (!panel.activeSelf)
             panel.SetActive(true);
