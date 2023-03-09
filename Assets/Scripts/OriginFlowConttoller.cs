@@ -30,14 +30,14 @@ public class OriginFlowConttoller : MonoBehaviour
             buttonText.text = nextText;
 
         //Deactivate current content
-        foreach (GameObject go in content[actualStep].ContentObjects)
-            go.SetActive(false);
+        Activate(false, content[actualStep].ContentObjects);
+        Activate(false, content[actualStep].UIObjects);
 
         actualStep++;
 
         //Activate next content
-        foreach (GameObject go in content[actualStep].ContentObjects)
-            go.SetActive(true);
+        Activate(true, content[actualStep].ContentObjects);
+        Activate(true, content[actualStep].UIObjects);
 
         if (actualStep + 1 >= content.Count)
             Restart();
@@ -46,6 +46,12 @@ public class OriginFlowConttoller : MonoBehaviour
     {
         actualStep = 0;
         buttonText.text = restartText;
+    }
+
+    private void Activate(bool activate, List<GameObject> list)
+    {
+        foreach (GameObject go in list)
+            go.SetActive(activate);
     }
 
     [Serializable]
