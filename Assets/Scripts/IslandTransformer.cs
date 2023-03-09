@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -17,15 +18,11 @@ public class IslandTransformer : MonoBehaviour
     //declare original position of the selected object (front object)
     private Vector3 originPosition;
 
-    public Transform currentFrontObject;
+    private Transform currentFrontObject;
 
     private Camera cam;
 
     private bool moving;
-
-    public GameObject firstIsland;
-    public GameObject secondIsland;
-    public GameObject thirdIsland;
 
     private void Start()
     {
@@ -36,7 +33,6 @@ public class IslandTransformer : MonoBehaviour
     {
         // return when not clicking
         if (!Input.GetMouseButtonDown(0)) return;
-        AudioManager.instance.SoundManager("Click");
         // return when object is moving
         if (moving) return;
 
@@ -46,6 +42,9 @@ public class IslandTransformer : MonoBehaviour
         //runs if the ray hits
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
+            //Click sound
+            AudioManager.instance.PlaySound(NonSpatialSound.Click);
+
             //declare the variable to store the selected object
             Transform hitObject = hit.transform;
             //Set the original position so that the object at front could be move back to that position in the future
@@ -56,17 +55,17 @@ public class IslandTransformer : MonoBehaviour
             {
                 if (!hit.transform.CompareTag("Waiting")) return;
 
-                AudioManager.instance.SoundManager("MovingIsland");
-
                 //starts the animation of the object to the front
                 StartCoroutine(MoveObject(hitObject));
+
+                //Show island title
+                if (hit.transform.TryGetComponent(out ContentController controller))
+                    controller.ShowTitle(true);
 
                 //Set tags into 'Front' representing the object is at front
                 hitObject.gameObject.tag = "Front";
 
-                GameObject frontObject = GameObject.FindWithTag("Front");
-
-                playSound(frontObject, null);
+                AudioManager.instance.PlaySound(NonSpatialSound.Move);
             }
 
             else
@@ -74,72 +73,36 @@ public class IslandTransformer : MonoBehaviour
                 //Open Scene
                 if (hit.collider.CompareTag("Front"))
                 {
-                    StartCoroutine(SelectObject(hitObject));
+                    StartCoroutine(ScaleObjectUp(hitObject));
+
+                    //Show content on island
+                    if (hit.transform.TryGetComponent(out ContentController controller))
+                        controller.ShowContent(true);
+
+                    AudioManager.instance.PlaySound(NonSpatialSound.Enlarge);
                 }
                 else if (hit.collider.CompareTag("Waiting"))     //swappping object
                 {
-                    //get the object that is going back 
-                    GameObject backObject = GameObject.FindWithTag("Front");
-
-                    AudioManager.instance.SoundManager("MovingIsland");
-
-                    Debug.Log("swapping");
-
                     Vector3 tempPosition = originPosition;
 
                     //starts the animation of the swapping between the selected object and the front object
                     StartCoroutine(SwapObjects(hitObject, currentFrontObject, tempPosition));
+                    AudioManager.instance.PlaySound(NonSpatialSound.Shrink);
+                    AudioManager.instance.PlaySound(NonSpatialSound.Move);
 
                     //Set tags into 'Front' representing the object is at front
                     hitObject.gameObject.tag = "Front";
                     currentFrontObject.tag = "Waiting";
 
-                    GameObject frontObject = GameObject.FindWithTag("Front");
-
-                    playSound(frontObject, backObject);
-
+                    //Hide content on island
+                    if (hit.transform.TryGetComponent(out ContentController controller))
+                    {
+                        controller.ShowTitle(false);
+                        controller.ShowContent(false);
+                    }
                 }
             }
 
-        }
-
-
-
-    }
-
-    void playSound(GameObject frontObject, GameObject backObject)
-    {
-        if (backObject != null)
-        {
-            if (backObject == firstIsland)
-            {
-
-                AudioManager.instance.SoundManager("FirstIsland", true);
-                AudioManager.instance.SoundManager("FirstIsland2", true);
-            }
-            else if (backObject == secondIsland)
-            {
-                AudioManager.instance.SoundManager("SecondIsland", true);
-            }
-            else
-            {
-                AudioManager.instance.SoundManager("ThirdIsland", true);
-            }
-        }
-
-        if (frontObject == firstIsland)
-        {
-            //firstIsland
-            AudioManager.instance.SoundManager("FirstIsland");
-            AudioManager.instance.SoundManager("FirstIsland2");
-        }
-        else if (frontObject == secondIsland)
-        {
-            AudioManager.instance.SoundManager("SecondIsland");
-        }
-        else
-        {
-            AudioManager.instance.SoundManager("ThirdIsland");
         }
     }
 
@@ -175,6 +138,7 @@ public class IslandTransformer : MonoBehaviour
 
             //the front object will move back to its original position
             frontObject.position = Vector3.MoveTowards(frontObject.position, returnPos, step);
+            StartCoroutine(ScaleObjectDown(frontObject));
 
             yield return null;
 
@@ -183,24 +147,20 @@ public class IslandTransformer : MonoBehaviour
         moving = false;
     }
 
-    //open up the front object
-    IEnumerator SelectObject(Transform selectedObj)
+    private IEnumerator ScaleObjectUp(Transform obj)
     {
-        bool scaleUp = selectedObj.localScale.x > 1 ? false : true;
-        bool condition = true;
-
-        if (scaleUp)
-            AudioManager.instance.SoundManager("Enlarge");
-        else
-            AudioManager.instance.SoundManager("Shrink");
-        while (condition)
+        while (obj.localScale.x < scaleChanged.x)
         {
-            condition = scaleUp ? selectedObj.localScale.x < scaleChanged.x : selectedObj.localScale.x > 1;
+            obj.localScale += Vector3.one * Time.deltaTime;
+            yield return null;
+        }
+    }
 
-            if (scaleUp)
-                selectedObj.localScale += Vector3.one * Time.deltaTime;
-            else
-                selectedObj.localScale -= Vector3.one * Time.deltaTime;
+    private IEnumerator ScaleObjectDown(Transform obj)
+    {
+        while (obj.localScale.x > 1)
+        {
+            obj.localScale -= Vector3.one * Time.deltaTime;
 
             yield return null;
         }

@@ -1,17 +1,17 @@
-using UnityEngine.Audio;
 using System;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 public class AudioManager : MonoBehaviour
 {
-    public Sound[] sounds;
-
     public static AudioManager instance;
+    public AudioSource audioSource;
+    public List<Audio> audioClips = new();
 
-    // Start is called before the first frame update
     void Awake()
     {
-        if(instance == null)
+        if (instance == null)
             instance = this;
         else
         {
@@ -19,35 +19,27 @@ public class AudioManager : MonoBehaviour
             return;
         }
         DontDestroyOnLoad(gameObject);
-
-        foreach (Sound s in sounds)
-        {
-            s.source = gameObject.AddComponent<AudioSource>();
-            s.source.clip = s.clip;
-            s.source.playOnAwake = false;
-            s.source.spatialBlend = s.ambient;
-
-            s.source.volume = s.volume;
-            s.source.pitch = s.pitch;
-            s.source.loop = s.loop;
-        }
     }
-
-    void Start()
+    public void PlaySound(NonSpatialSound sound)
     {
-        SoundManager("Background");
-    }
+        Audio audio = audioClips.FirstOrDefault(x => x.Sound == sound);
+        if (audio == null) return;
 
-    public void SoundManager(string name, bool stop = false)
-    {
-        Sound s = Array.Find(sounds, sound => sound.name == name);
-        if (s == null)
-        {
-            Debug.LogWarning("Sound: " + name + " not found!");
-            return;
-        }
-        s.source.Play();
-        if (stop)
-            s.source.Stop();
+        audioSource.clip = audio.AudioClip;
+        audioSource.Play();
     }
+}
+
+public enum NonSpatialSound
+{
+    Click,
+    Enlarge,
+    Shrink,
+    Move
+}
+[Serializable]
+public class Audio
+{
+    public NonSpatialSound Sound;
+    public AudioClip AudioClip;
 }

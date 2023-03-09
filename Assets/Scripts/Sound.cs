@@ -17,6 +17,8 @@ public class Sound
     [Tooltip("0 = not 3d, 1 = 3d")]
     public float ambient;
 
+    public GameObject targetObject;
+
     [HideInInspector]
     public AudioSource source;
 }
