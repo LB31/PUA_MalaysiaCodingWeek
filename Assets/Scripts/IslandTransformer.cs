@@ -62,6 +62,7 @@ public class IslandTransformer : MonoBehaviour
                 //Set tags into 'Front' representing the object is at front
                 hitObject.gameObject.tag = "Front";
             }
+
             else
             {
                 //Open Scene
