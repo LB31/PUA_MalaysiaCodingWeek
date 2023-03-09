@@ -22,7 +22,11 @@ public class AudioManager : MonoBehaviour
 
         foreach (Sound s in sounds)
         {
-            s.source = gameObject.AddComponent<AudioSource>();
+            GameObject target = s.targetObject;
+            if (target == null)
+                target = gameObject;
+
+            s.source = target.AddComponent<AudioSource>();
             s.source.clip = s.clip;
             s.source.playOnAwake = false;
             s.source.spatialBlend = s.ambient;
@@ -30,6 +34,7 @@ public class AudioManager : MonoBehaviour
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
             s.source.loop = s.loop;
+            
         }
     }
 
