@@ -8,6 +8,7 @@ public class ContentController : MonoBehaviour
     public List<GameObject> content = new();
     public bool destroy = false;
     public GameObject ContentPrefab;
+    public bool IsActing;
 
     private void Start()
     {
@@ -19,7 +20,7 @@ public class ContentController : MonoBehaviour
         if (destroy)
         {
             if (show)
-                Instantiate(ContentPrefab, transform);
+                content.Add(Instantiate(ContentPrefab, transform));
             else
                 content.ForEach(x => Destroy(x));
             return;

@@ -77,7 +77,11 @@ public class IslandTransformer : MonoBehaviour
 
                     //Show content on island
                     if (hit.transform.TryGetComponent(out ContentController controller))
+                    {
+                        if (controller.IsActing) return;
+                        controller.IsActing = true;
                         controller.ShowContent(true);
+                    }
 
                     AudioManager.instance.PlaySound(NonSpatialSound.Enlarge);
                 }
@@ -95,10 +99,11 @@ public class IslandTransformer : MonoBehaviour
                     currentFrontObject.tag = "Waiting";
 
                     //Hide content on island
-                    if (hit.transform.TryGetComponent(out ContentController controller))
+                    if (currentFrontObject.TryGetComponent(out ContentController controller))
                     {
                         controller.ShowTitle(false);
                         controller.ShowContent(false);
+                        controller.IsActing = false;
                     }
                 }
             }
