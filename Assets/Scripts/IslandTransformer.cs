@@ -81,6 +81,7 @@ public class IslandTransformer : MonoBehaviour
                         if (controller.IsActing) return;
                         controller.IsActing = true;
                         controller.ShowContent(true);
+                        controller.GetComponent<Collider>().enabled = false;
                     }
 
                     AudioManager.instance.PlaySound(NonSpatialSound.Enlarge);
@@ -104,6 +105,7 @@ public class IslandTransformer : MonoBehaviour
                         controller.ShowTitle(false);
                         controller.ShowContent(false);
                         controller.IsActing = false;
+                        controller.GetComponent<Collider>().enabled = true;
                     }
                 }
             }
