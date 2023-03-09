@@ -14,6 +14,8 @@ public class Sound
     public float pitch;
 
     public bool loop;
+    [Tooltip("0 = not 3d, 1 = 3d")]
+    public float ambient;
 
     [HideInInspector]
     public AudioSource source;

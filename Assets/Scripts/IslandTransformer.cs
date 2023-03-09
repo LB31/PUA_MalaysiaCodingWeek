@@ -36,7 +36,7 @@ public class IslandTransformer : MonoBehaviour
     {
         // return when not clicking
         if (!Input.GetMouseButtonDown(0)) return;
-        FindObjectOfType<AudioManager>().Play("Click");
+        AudioManager.instance.SoundManager("Click");
         // return when object is moving
         if (moving) return;
 
@@ -56,7 +56,7 @@ public class IslandTransformer : MonoBehaviour
             {
                 if (!hit.transform.CompareTag("Waiting")) return;
 
-                FindObjectOfType<AudioManager>().Play("MovingIsland");
+                AudioManager.instance.SoundManager("MovingIsland");
 
                 //starts the animation of the object to the front
                 StartCoroutine(MoveObject(hitObject));
@@ -80,7 +80,7 @@ public class IslandTransformer : MonoBehaviour
                     //get the object that is going back 
                     GameObject backObject = GameObject.FindWithTag("Front");
 
-                    FindObjectOfType<AudioManager>().Play("MovingIsland");
+                    AudioManager.instance.SoundManager("MovingIsland");
 
                     Debug.Log("swapping");
 
@@ -96,7 +96,7 @@ public class IslandTransformer : MonoBehaviour
                     GameObject frontObject = GameObject.FindWithTag("Front");
 
                     playSound(frontObject, backObject);
-                    
+
                 }
             }
 
@@ -108,36 +108,37 @@ public class IslandTransformer : MonoBehaviour
 
     void playSound(GameObject frontObject, GameObject backObject)
     {
-       /* if (backObject != null)
+        if (backObject != null)
         {
             if (backObject == firstIsland)
             {
-                
-                FindObjectOfType<AudioManager>()("FirstIsland");
-                FindObjectOfType<AudioManager>().Play("FirstIsland2");
+
+                AudioManager.instance.SoundManager("FirstIsland", true);
+                AudioManager.instance.SoundManager("FirstIsland2", true);
             }
             else if (backObject == secondIsland)
             {
-                FindObjectOfType<AudioManager>().Play("SecondIsland");
+                AudioManager.instance.SoundManager("SecondIsland", true);
             }
             else
             {
-                FindObjectOfType<AudioManager>().Play("ThirdIsland");
+                AudioManager.instance.SoundManager("ThirdIsland", true);
             }
         }
-       */
+
         if (frontObject == firstIsland)
         {
-            FindObjectOfType<AudioManager>().Play("FirstIsland");
-            FindObjectOfType<AudioManager>().Play("FirstIsland2");
+            //firstIsland
+            AudioManager.instance.SoundManager("FirstIsland");
+            AudioManager.instance.SoundManager("FirstIsland2");
         }
         else if (frontObject == secondIsland)
         {
-            FindObjectOfType<AudioManager>().Play("SecondIsland");
+            AudioManager.instance.SoundManager("SecondIsland");
         }
         else
         {
-            FindObjectOfType<AudioManager>().Play("ThirdIsland");
+            AudioManager.instance.SoundManager("ThirdIsland");
         }
     }
 
@@ -146,7 +147,6 @@ public class IslandTransformer : MonoBehaviour
     {
         moving = true;
         //while the selected object is not at the front
-
         while (!SamePositionApproximately(objectToMove.position, target.position))
         {
             float step = speed * Time.deltaTime; //calculate distance to move
@@ -188,10 +188,10 @@ public class IslandTransformer : MonoBehaviour
         bool scaleUp = selectedObj.localScale.x > 1 ? false : true;
         bool condition = true;
 
-        if(scaleUp)
-            FindObjectOfType<AudioManager>().Play("Enlarge");
+        if (scaleUp)
+            AudioManager.instance.SoundManager("Enlarge");
         else
-            FindObjectOfType<AudioManager>().Play("Shrink");
+            AudioManager.instance.SoundManager("Shrink");
         while (condition)
         {
             condition = scaleUp ? selectedObj.localScale.x < scaleChanged.x : selectedObj.localScale.x > 1;

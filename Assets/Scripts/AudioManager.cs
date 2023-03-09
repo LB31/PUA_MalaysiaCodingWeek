@@ -24,6 +24,8 @@ public class AudioManager : MonoBehaviour
         {
             s.source = gameObject.AddComponent<AudioSource>();
             s.source.clip = s.clip;
+            s.source.playOnAwake = false;
+            s.source.spatialBlend = s.ambient;
 
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
@@ -33,10 +35,10 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        Play("Background");
+        SoundManager("Background");
     }
 
-    public void Play(string name)
+    public void SoundManager(string name, bool stop = false)
     {
         Sound s = Array.Find(sounds, sound => sound.name == name);
         if (s == null)
@@ -45,6 +47,7 @@ public class AudioManager : MonoBehaviour
             return;
         }
         s.source.Play();
-
+        if (stop)
+            s.source.Stop();
     }
 }
