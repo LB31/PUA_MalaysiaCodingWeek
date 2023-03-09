@@ -68,6 +68,7 @@ public class IslandTransformer : MonoBehaviour
 
                 playSound(frontObject, null);
             }
+
             else
             {
                 //Open Scene
