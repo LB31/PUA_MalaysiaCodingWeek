@@ -25,7 +25,7 @@ public class ColorChanger : MonoBehaviour
 
     private void Start()
     {
-        activePlant = new(Color.black, null);
+        activePlant = null;
     }
 
     private void FixedUpdate()
@@ -38,24 +38,31 @@ public class ColorChanger : MonoBehaviour
                 return;
         }
 
-        if (Physics.SphereCast(cameraTrans.position, radius, cameraTrans.forward, out RaycastHit hit, 10, plantLayer))
-        {
-            duration += Time.fixedDeltaTime;
+        Debug.DrawRay(cameraTrans.position, cameraTrans.forward * 10, Color.green);
 
-            if (duration >= secondsUntilShowingUI)
+        if (Physics.Raycast(cameraTrans.position, cameraTrans.forward, out RaycastHit hit, 10000))
+        {
+            if (activePlant!= null)
             {
-                activePlant = plantsData.FirstOrDefault(x => x.PlantUI.transform.parent.transform == hit.transform);
+                if (activePlant.Plant == hit.transform.gameObject) return;
+            }
+            //duration += Time.fixedDeltaTime;
+
+            //if (duration >= secondsUntilShowingUI)
+            {
+                activePlant = plantsData.FirstOrDefault(x => x.Plant == hit.transform.gameObject);
                 ActivatePlantChanges(true);
             }
 
             return;
         }
 
-        duration = 0;
+        //duration = 0;
         ActivatePlantChanges(false);
     }
     private void ActivatePlantChanges(bool activate)
     {
+        if (activePlant == null) return;
         if (activePlant.PlantUI == null) return;
 
         activePlant.PlantUI.SetActive(activate);
@@ -66,11 +73,13 @@ public class ColorChanger : MonoBehaviour
 public class PlantData
 {
     public Color Color;
+    public GameObject Plant;
     public GameObject PlantUI;
 
-    public PlantData(Color color, GameObject plantUI)
+    public PlantData(Color color, GameObject plantUI, GameObject plant)
     {
         Color = color;
+        Plant = plant;
         PlantUI = plantUI;
     }
 }
