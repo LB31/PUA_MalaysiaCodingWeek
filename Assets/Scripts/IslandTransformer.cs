@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -18,11 +17,15 @@ public class IslandTransformer : MonoBehaviour
     //declare original position of the selected object (front object)
     private Vector3 originPosition;
 
-    private Transform currentFrontObject;
+    public Transform currentFrontObject;
 
     private Camera cam;
 
     private bool moving;
+
+    public GameObject firstIsland;
+    public GameObject secondIsland;
+    public GameObject thirdIsland;
 
     private void Start()
     {
@@ -33,6 +36,7 @@ public class IslandTransformer : MonoBehaviour
     {
         // return when not clicking
         if (!Input.GetMouseButtonDown(0)) return;
+        AudioManager.instance.SoundManager("Click");
         // return when object is moving
         if (moving) return;
 
@@ -52,15 +56,17 @@ public class IslandTransformer : MonoBehaviour
             {
                 if (!hit.transform.CompareTag("Waiting")) return;
 
+                AudioManager.instance.SoundManager("MovingIsland");
+
                 //starts the animation of the object to the front
                 StartCoroutine(MoveObject(hitObject));
 
-                //Show island title
-                if (hit.transform.TryGetComponent(out ContentController controller))
-                    controller.ShowTitle(true);
-
                 //Set tags into 'Front' representing the object is at front
                 hitObject.gameObject.tag = "Front";
+
+                GameObject frontObject = GameObject.FindWithTag("Front");
+
+                playSound(frontObject, null);
             }
 
             else
@@ -68,14 +74,15 @@ public class IslandTransformer : MonoBehaviour
                 //Open Scene
                 if (hit.collider.CompareTag("Front"))
                 {
-                    StartCoroutine(ScaleObjectUp(hitObject));
-
-                    //Show content on island
-                    if (hit.transform.TryGetComponent(out ContentController controller))
-                        controller.ShowContent(true);
+                    StartCoroutine(SelectObject(hitObject));
                 }
                 else if (hit.collider.CompareTag("Waiting"))     //swappping object
                 {
+                    //get the object that is going back 
+                    GameObject backObject = GameObject.FindWithTag("Front");
+
+                    AudioManager.instance.SoundManager("MovingIsland");
+
                     Debug.Log("swapping");
 
                     Vector3 tempPosition = originPosition;
@@ -87,15 +94,52 @@ public class IslandTransformer : MonoBehaviour
                     hitObject.gameObject.tag = "Front";
                     currentFrontObject.tag = "Waiting";
 
-                    //Hide content on island
-                    if (hit.transform.TryGetComponent(out ContentController controller))
-                    {
-                        controller.ShowTitle(false);
-                        controller.ShowContent(false);
-                    }
+                    GameObject frontObject = GameObject.FindWithTag("Front");
+
+                    playSound(frontObject, backObject);
+
                 }
             }
 
+        }
+
+
+
+    }
+
+    void playSound(GameObject frontObject, GameObject backObject)
+    {
+        if (backObject != null)
+        {
+            if (backObject == firstIsland)
+            {
+
+                AudioManager.instance.SoundManager("FirstIsland", true);
+                AudioManager.instance.SoundManager("FirstIsland2", true);
+            }
+            else if (backObject == secondIsland)
+            {
+                AudioManager.instance.SoundManager("SecondIsland", true);
+            }
+            else
+            {
+                AudioManager.instance.SoundManager("ThirdIsland", true);
+            }
+        }
+
+        if (frontObject == firstIsland)
+        {
+            //firstIsland
+            AudioManager.instance.SoundManager("FirstIsland");
+            AudioManager.instance.SoundManager("FirstIsland2");
+        }
+        else if (frontObject == secondIsland)
+        {
+            AudioManager.instance.SoundManager("SecondIsland");
+        }
+        else
+        {
+            AudioManager.instance.SoundManager("ThirdIsland");
         }
     }
 
@@ -131,7 +175,6 @@ public class IslandTransformer : MonoBehaviour
 
             //the front object will move back to its original position
             frontObject.position = Vector3.MoveTowards(frontObject.position, returnPos, step);
-            StartCoroutine(ScaleObjectDown(frontObject));
 
             yield return null;
 
@@ -140,20 +183,24 @@ public class IslandTransformer : MonoBehaviour
         moving = false;
     }
 
-    private IEnumerator ScaleObjectUp(Transform obj)
+    //open up the front object
+    IEnumerator SelectObject(Transform selectedObj)
     {
-        while (obj.localScale.x < scaleChanged.x)
-        {
-            obj.localScale += Vector3.one * Time.deltaTime;
-            yield return null;
-        }
-    }
+        bool scaleUp = selectedObj.localScale.x > 1 ? false : true;
+        bool condition = true;
 
-    private IEnumerator ScaleObjectDown(Transform obj)
-    {
-        while (obj.localScale.x > 1)
+        if (scaleUp)
+            AudioManager.instance.SoundManager("Enlarge");
+        else
+            AudioManager.instance.SoundManager("Shrink");
+        while (condition)
         {
-            obj.localScale -= Vector3.one * Time.deltaTime;
+            condition = scaleUp ? selectedObj.localScale.x < scaleChanged.x : selectedObj.localScale.x > 1;
+
+            if (scaleUp)
+                selectedObj.localScale += Vector3.one * Time.deltaTime;
+            else
+                selectedObj.localScale -= Vector3.one * Time.deltaTime;
 
             yield return null;
         }
