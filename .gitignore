@@ -59,3 +59,5 @@ sysinfo.txt
 crashlytics-build.properties
 
 Assets/Fonts/SpaceMono-Regular.asset
+Assets/PlayMaker/Editor/Resources/EditorStartupPrefs.asset
+Assets/PlayMaker/Editor/Resources/EditorStartupPrefs.asset

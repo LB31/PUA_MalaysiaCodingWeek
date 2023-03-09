@@ -1332,7 +1332,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3238514655654223037
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1540,11 +1540,14 @@ MonoBehaviour:
     m_Bits: 128
   secondsUntilShowingUI: 1
   plantsData:
-  - Color: {r: 0.59607846, g: 0.16078432, b: 0.18431373, a: 0}
+  - Color: {r: 0.59607846, g: 0.16078432, b: 0.18431373, a: 1}
+    Plant: {fileID: 3238514656314253724}
     PlantUI: {fileID: 3238514655182545270}
-  - Color: {r: 0.29411766, g: 0.078431375, b: 0.09019608, a: 0}
+  - Color: {r: 0.29411766, g: 0.078431375, b: 0.09019608, a: 1}
+    Plant: {fileID: 3238514656226899946}
     PlantUI: {fileID: 3238514654582780302}
-  - Color: {r: 0.10980392, g: 0.16078432, b: 0.28627452, a: 0}
+  - Color: {r: 0.10980392, g: 0.16078432, b: 0.28627452, a: 1}
+    Plant: {fileID: 3238514656286237029}
     PlantUI: {fileID: 3238514655654223032}
   mesh: {fileID: 3238514655617399162}
   cameraTrans: {fileID: 0}
