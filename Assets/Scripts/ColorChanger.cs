@@ -21,7 +21,12 @@ public class ColorChanger : MonoBehaviour
     [SerializeField] private float radius = 1;
 
     float duration = 0;
-    PlantData activePlant = new();
+    PlantData activePlant;
+
+    private void Start()
+    {
+        activePlant = new(Color.black, null);
+    }
 
     private void FixedUpdate()
     {
@@ -39,7 +44,6 @@ public class ColorChanger : MonoBehaviour
 
             if (duration >= secondsUntilShowingUI)
             {
-                ActivatePlantChanges(false);
                 activePlant = plantsData.FirstOrDefault(x => x.PlantUI.transform.parent.transform == hit.transform);
                 ActivatePlantChanges(true);
             }
@@ -52,12 +56,10 @@ public class ColorChanger : MonoBehaviour
     }
     private void ActivatePlantChanges(bool activate)
     {
-        if (!activePlant.PlantUI) return;
+        if (activePlant.PlantUI == null) return;
 
         activePlant.PlantUI.SetActive(activate);
-
-        if (activate)
-            mesh.material.color = activePlant.Color;
+        mesh.material.color = activate ? activePlant.Color : Color.black;
     }
 }
 [Serializable]
@@ -65,4 +67,10 @@ public class PlantData
 {
     public Color Color;
     public GameObject PlantUI;
+
+    public PlantData(Color color, GameObject plantUI)
+    {
+        Color = color;
+        PlantUI = plantUI;
+    }
 }

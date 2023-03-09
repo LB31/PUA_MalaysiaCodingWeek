@@ -62,6 +62,7 @@ public class IslandTransformer : MonoBehaviour
                 //Set tags into 'Front' representing the object is at front
                 hitObject.gameObject.tag = "Front";
             }
+
             else
             {
                 //Open Scene
@@ -75,8 +76,6 @@ public class IslandTransformer : MonoBehaviour
                 }
                 else if (hit.collider.CompareTag("Waiting"))     //swappping object
                 {
-                    Debug.Log("swapping");
-
                     Vector3 tempPosition = originPosition;
 
                     //starts the animation of the swapping between the selected object and the front object
