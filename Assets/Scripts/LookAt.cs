@@ -11,7 +11,7 @@ public class LookAt : MonoBehaviour
 
     private void Update()
     {
-        Vector3 lookAtPosition = new Vector3(mainCameraTransform.position.x, transform.position.y, mainCameraTransform.position.z);
-        transform.LookAt(lookAtPosition, Vector3.up);
+        Vector3 targetPosition = new Vector3(mainCameraTransform.transform.position.x, transform.position.y, mainCameraTransform.transform.position.z);
+        transform.LookAt(2 * transform.position - targetPosition);
     }
 }

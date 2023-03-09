@@ -82,8 +82,10 @@ public class BrushControllerNeo : MonoBehaviour
                     removedVertices++;
                     if (removedVertices >= MaxVertices)
                     {
+                        MaxVertices = int.MaxValue;
                         // Finished swiping
                         Debug.Log("NO SWIPE");
+                        PlayMakerFSM.BroadcastEvent("SwipingEnded");
                     }
                 }
             }

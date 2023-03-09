@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -17,7 +18,7 @@ public class IslandTransformer : MonoBehaviour
     //declare original position of the selected object (front object)
     private Vector3 originPosition;
 
-    public Transform currentFrontObject;
+    private Transform currentFrontObject;
 
     private Camera cam;
 
@@ -54,6 +55,10 @@ public class IslandTransformer : MonoBehaviour
                 //starts the animation of the object to the front
                 StartCoroutine(MoveObject(hitObject));
 
+                //Show island title
+                if (hit.transform.TryGetComponent(out ContentController controller))
+                    controller.ShowTitle(true);
+
                 //Set tags into 'Front' representing the object is at front
                 hitObject.gameObject.tag = "Front";
             }
@@ -63,6 +68,10 @@ public class IslandTransformer : MonoBehaviour
                 if (hit.collider.CompareTag("Front"))
                 {
                     StartCoroutine(ScaleObjectUp(hitObject));
+
+                    //Show content on island
+                    if (hit.transform.TryGetComponent(out ContentController controller))
+                        controller.ShowContent(true);
                 }
                 else if (hit.collider.CompareTag("Waiting"))     //swappping object
                 {
@@ -76,6 +85,13 @@ public class IslandTransformer : MonoBehaviour
                     //Set tags into 'Front' representing the object is at front
                     hitObject.gameObject.tag = "Front";
                     currentFrontObject.tag = "Waiting";
+
+                    //Hide content on island
+                    if (hit.transform.TryGetComponent(out ContentController controller))
+                    {
+                        controller.ShowTitle(false);
+                        controller.ShowContent(false);
+                    }
                 }
             }
 
@@ -134,7 +150,7 @@ public class IslandTransformer : MonoBehaviour
 
     private IEnumerator ScaleObjectDown(Transform obj)
     {
-        while(obj.localScale.x > 1)
+        while (obj.localScale.x > 1)
         {
             obj.localScale -= Vector3.one * Time.deltaTime;
 
