@@ -23,6 +23,8 @@ public class ARPlacer : MonoBehaviour
     // Current plane hits
     private List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
+    private bool placed;
+
     private void Awake()
     {
         raycastManager = GetComponent<ARRaycastManager>();
@@ -35,6 +37,8 @@ public class ARPlacer : MonoBehaviour
 
     private void Update()
     {
+        if (placed) return;
+
         PlaneDragging();
     }
 
@@ -59,9 +63,7 @@ public class ARPlacer : MonoBehaviour
         FinishPlacement();
         TogglePlacement(false);
 
-        actualObject.transform.position = placementIndicator.transform.position;
-
-
+        actualObject.transform.SetPositionAndRotation(placementIndicator.transform.position, placementIndicator.transform.rotation);
     }
 
     private void FinishPlacement()
@@ -94,6 +96,8 @@ public class ARPlacer : MonoBehaviour
 
         placementIndicator.SetActive(activatePlacement);
         actualObject.SetActive(!activatePlacement);
+
+        placed = !activatePlacement;
     }
 
     public void RestartPlacing()

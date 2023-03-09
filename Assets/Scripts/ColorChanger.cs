@@ -25,12 +25,21 @@ public class ColorChanger : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!cameraTrans)
+        {
+            if (Camera.main)
+                cameraTrans = Camera.main.transform;
+            else
+                return;
+        }
+
         if (Physics.SphereCast(cameraTrans.position, radius, cameraTrans.forward, out RaycastHit hit, 10, plantLayer))
         {
             duration += Time.fixedDeltaTime;
 
             if (duration >= secondsUntilShowingUI)
             {
+                ActivatePlantChanges(false);
                 activePlant = plantsData.FirstOrDefault(x => x.PlantUI.transform.parent.transform == hit.transform);
                 ActivatePlantChanges(true);
             }
@@ -52,7 +61,7 @@ public class ColorChanger : MonoBehaviour
     }
 }
 [Serializable]
-public struct PlantData
+public class PlantData
 {
     public Color Color;
     public GameObject PlantUI;
