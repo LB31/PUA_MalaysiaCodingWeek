@@ -27,7 +27,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5915528686136385397}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.0009999871}
+  m_LocalPosition: {x: 0, y: 0, z: 0.001}
   m_LocalScale: {x: 0.17, y: 0.11, z: 0.0001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36,7 +36,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0842886, y: -0.061571598}
+  m_AnchoredPosition: {x: -0.148, y: -0.097}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.49404308, y: 0.49415728}
 --- !u!33 &5915528686136385385
@@ -113,6 +113,7 @@ GameObject:
   - component: {fileID: 5915528688002041861}
   - component: {fileID: 5915528688002041858}
   - component: {fileID: 5915528688002041859}
+  - component: {fileID: 2619362901825407730}
   m_Layer: 0
   m_Name: SpeechBubble
   m_TagString: Untagged
@@ -129,7 +130,7 @@ RectTransform:
   m_GameObject: {fileID: 5915528688002041856}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.629}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 8.611781, y: 8.611782, z: 8.611781}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5915528686136385396}
@@ -203,9 +204,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Where is my wife?
-
-    I may ask in the village'
+  m_text: 'Krokodrill! Oh no. '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
   m_sharedMaterial: {fileID: 2147374, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
@@ -277,3 +276,15 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 5915528688002041858}
   m_maskType: 0
+--- !u!114 &2619362901825407730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5915528688002041856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 332ba003d1c6647b8a58f5f6d82cc22a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
