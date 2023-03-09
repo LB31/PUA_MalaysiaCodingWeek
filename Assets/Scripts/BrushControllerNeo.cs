@@ -19,11 +19,13 @@ public class BrushControllerNeo : MonoBehaviour
     private Mesh mesh;
     private Vector3[] vertices;
     private Color[] colors;
+    private int maxVexBackup;
 
     private int removedVertices;
 
     void Start()
     {
+        maxVexBackup = MaxVertices;
         Initialize();
     }
 
@@ -40,6 +42,7 @@ public class BrushControllerNeo : MonoBehaviour
         mesh.colors = colors;
 
         removedVertices = 0;
+        MaxVertices = maxVexBackup;
     }
 
     void Update()
