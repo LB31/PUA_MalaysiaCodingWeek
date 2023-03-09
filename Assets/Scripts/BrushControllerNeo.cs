@@ -7,17 +7,20 @@ public class BrushControllerNeo : MonoBehaviour
     public GameObject ImageToSwipe;
     public GameObject ImageToSwipeProp
     {
-        get { return ImageToSwipe; }  
+        get { return ImageToSwipe; }
         set { ImageToSwipe = value; Initialize(); }
     }
 
     public float radius = 2;
     public string targetTag = "Target";
     public Color StartColor = Color.grey;
+    public int MaxVertices = 30;
 
     private Mesh mesh;
     private Vector3[] vertices;
     private Color[] colors;
+
+    private int removedVertices;
 
     void Start()
     {
@@ -35,6 +38,8 @@ public class BrushControllerNeo : MonoBehaviour
         }
 
         mesh.colors = colors;
+
+        removedVertices = 0;
     }
 
     void Update()
@@ -70,8 +75,18 @@ public class BrushControllerNeo : MonoBehaviour
             if (dist < radiusSqr)
             {
                 float alpha = Mathf.Min(colors[i].a, dist / radiusSqr);
+                float previousA = colors[i].a;
                 colors[i].a = alpha;
-            }          
+                if (colors[i].a < 0.01f && colors[i].a != previousA)
+                {
+                    removedVertices++;
+                    if (removedVertices >= MaxVertices)
+                    {
+                        // Finished swiping
+                        Debug.Log("NO SWIPE");
+                    }
+                }
+            }
         }
 
         mesh.colors = colors;
