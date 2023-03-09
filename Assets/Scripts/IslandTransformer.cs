@@ -23,6 +23,10 @@ public class IslandTransformer : MonoBehaviour
 
     private bool moving;
 
+    public GameObject firstIsland;
+    public GameObject secondIsland;
+    public GameObject thirdIsland;
+
     private void Start()
     {
         cam = Camera.main;
@@ -32,6 +36,7 @@ public class IslandTransformer : MonoBehaviour
     {
         // return when not clicking
         if (!Input.GetMouseButtonDown(0)) return;
+        FindObjectOfType<AudioManager>().Play("Click");
         // return when object is moving
         if (moving) return;
 
@@ -51,11 +56,17 @@ public class IslandTransformer : MonoBehaviour
             {
                 if (!hit.transform.CompareTag("Waiting")) return;
 
+                FindObjectOfType<AudioManager>().Play("MovingIsland");
+
                 //starts the animation of the object to the front
                 StartCoroutine(MoveObject(hitObject));
 
                 //Set tags into 'Front' representing the object is at front
                 hitObject.gameObject.tag = "Front";
+
+                GameObject frontObject = GameObject.FindWithTag("Front");
+
+                playSound(frontObject, null);
             }
             else
             {
@@ -66,6 +77,11 @@ public class IslandTransformer : MonoBehaviour
                 }
                 else if (hit.collider.CompareTag("Waiting"))     //swappping object
                 {
+                    //get the object that is going back 
+                    GameObject backObject = GameObject.FindWithTag("Front");
+
+                    FindObjectOfType<AudioManager>().Play("MovingIsland");
+
                     Debug.Log("swapping");
 
                     Vector3 tempPosition = originPosition;
@@ -76,9 +92,52 @@ public class IslandTransformer : MonoBehaviour
                     //Set tags into 'Front' representing the object is at front
                     hitObject.gameObject.tag = "Front";
                     currentFrontObject.tag = "Waiting";
+
+                    GameObject frontObject = GameObject.FindWithTag("Front");
+
+                    playSound(frontObject, backObject);
+                    
                 }
             }
 
+        }
+
+
+
+    }
+
+    void playSound(GameObject frontObject, GameObject backObject)
+    {
+       /* if (backObject != null)
+        {
+            if (backObject == firstIsland)
+            {
+                
+                FindObjectOfType<AudioManager>()("FirstIsland");
+                FindObjectOfType<AudioManager>().Play("FirstIsland2");
+            }
+            else if (backObject == secondIsland)
+            {
+                FindObjectOfType<AudioManager>().Play("SecondIsland");
+            }
+            else
+            {
+                FindObjectOfType<AudioManager>().Play("ThirdIsland");
+            }
+        }
+       */
+        if (frontObject == firstIsland)
+        {
+            FindObjectOfType<AudioManager>().Play("FirstIsland");
+            FindObjectOfType<AudioManager>().Play("FirstIsland2");
+        }
+        else if (frontObject == secondIsland)
+        {
+            FindObjectOfType<AudioManager>().Play("SecondIsland");
+        }
+        else
+        {
+            FindObjectOfType<AudioManager>().Play("ThirdIsland");
         }
     }
 
@@ -87,6 +146,7 @@ public class IslandTransformer : MonoBehaviour
     {
         moving = true;
         //while the selected object is not at the front
+
         while (!SamePositionApproximately(objectToMove.position, target.position))
         {
             float step = speed * Time.deltaTime; //calculate distance to move
@@ -128,6 +188,10 @@ public class IslandTransformer : MonoBehaviour
         bool scaleUp = selectedObj.localScale.x > 1 ? false : true;
         bool condition = true;
 
+        if(scaleUp)
+            FindObjectOfType<AudioManager>().Play("Enlarge");
+        else
+            FindObjectOfType<AudioManager>().Play("Shrink");
         while (condition)
         {
             condition = scaleUp ? selectedObj.localScale.x < scaleChanged.x : selectedObj.localScale.x > 1;
