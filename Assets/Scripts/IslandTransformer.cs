@@ -128,7 +128,6 @@ public class IslandTransformer : MonoBehaviour
         while (obj.localScale.x < scaleChanged.x)
         {
             obj.localScale += Vector3.one * Time.deltaTime;
-            Debug.Log(obj.localScale);
             yield return null;
         }
     }
