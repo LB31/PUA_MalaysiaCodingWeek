@@ -25,6 +25,14 @@ public class ColorChanger : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!cameraTrans)
+        {
+            if (Camera.main)
+                cameraTrans = Camera.main.transform;
+            else
+                return;
+        }
+
         if (Physics.SphereCast(cameraTrans.position, radius, cameraTrans.forward, out RaycastHit hit, 10, plantLayer))
         {
             duration += Time.fixedDeltaTime;
