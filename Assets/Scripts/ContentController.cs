@@ -7,6 +7,11 @@ public class ContentController : MonoBehaviour
     public GameObject title;
     public List<GameObject> content = new();
 
+    private void Start()
+    {
+        ShowTitle(false);
+        ShowContent(false);
+    }
     public void ShowContent(bool show)
     {
         content.ForEach(x => x.SetActive(show));
