@@ -13,7 +13,7 @@ public class IslandTransformer : MonoBehaviour
     public Transform target;
 
     //speficies distance moved and scaled when front object clicked
-    public Vector3 scaleChanged;
+    public float scaleChanged = 2;
 
     //declare original position of the selected object (front object)
     private Vector3 originPosition;
@@ -149,7 +149,7 @@ public class IslandTransformer : MonoBehaviour
 
     private IEnumerator ScaleObjectUp(Transform obj)
     {
-        while (obj.localScale.x < scaleChanged.x)
+        while (obj.localScale.x < scaleChanged)
         {
             obj.localScale += Vector3.one * Time.deltaTime;
             yield return null;

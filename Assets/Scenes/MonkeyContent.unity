@@ -6512,7 +6512,7 @@ MonoBehaviour:
     dataVersion: 2
     usedInTemplate: {fileID: 0}
     name: FSM
-    startState: Activate man
+    startState: Move PUA 1 to player
     states:
     - name: Move PUA 1 to player
       description: 

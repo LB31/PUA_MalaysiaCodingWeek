@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.ARFoundation;
@@ -11,9 +12,13 @@ public class ARPlacer : MonoBehaviour
     [SerializeField] private GameObject actualObject;
     [SerializeField] private GameObject placementIndicator;
 
+    [SerializeField] private int secondsForTutorial = 5; 
+
     // Buttons
     [SerializeField] private GameObject buttonPlacement;
     [SerializeField] private GameObject buttonRestart;
+
+    [SerializeField] private GameObject placeTutorial;
 
     private ARRaycastManager raycastManager;
     private ARPlaneManager planeManager;
@@ -89,7 +94,7 @@ public class ARPlacer : MonoBehaviour
         }
     }
 
-    private void TogglePlacement(bool activatePlacement)
+    private async void TogglePlacement(bool activatePlacement)
     {
         buttonPlacement.SetActive(activatePlacement);
         buttonRestart.SetActive(!activatePlacement);
@@ -98,6 +103,14 @@ public class ARPlacer : MonoBehaviour
         actualObject.SetActive(!activatePlacement);
 
         placed = !activatePlacement;
+
+        placeTutorial.SetActive(activatePlacement);
+
+        if (activatePlacement)
+        {
+            await Task.Delay(secondsForTutorial * 1000);
+            placeTutorial.SetActive(false);
+        }
     }
 
     public void RestartPlacing()
@@ -105,7 +118,5 @@ public class ARPlacer : MonoBehaviour
         TogglePlacement(true);
         TogglePlanes(true);
     }
-
-
 
 }
