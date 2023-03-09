@@ -31,6 +31,7 @@ public class ColorChanger : MonoBehaviour
 
             if (duration >= secondsUntilShowingUI)
             {
+                ActivatePlantChanges(false);
                 activePlant = plantsData.FirstOrDefault(x => x.PlantUI.transform.parent.transform == hit.transform);
                 ActivatePlantChanges(true);
             }
@@ -52,7 +53,7 @@ public class ColorChanger : MonoBehaviour
     }
 }
 [Serializable]
-public struct PlantData
+public class PlantData
 {
     public Color Color;
     public GameObject PlantUI;
