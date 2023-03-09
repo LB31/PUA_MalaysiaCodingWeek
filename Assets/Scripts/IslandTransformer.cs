@@ -42,6 +42,9 @@ public class IslandTransformer : MonoBehaviour
         //runs if the ray hits
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
+            //Click sound
+            AudioManager.instance.PlaySound(NonSpatialSound.Click);
+
             //declare the variable to store the selected object
             Transform hitObject = hit.transform;
             //Set the original position so that the object at front could be move back to that position in the future
@@ -61,6 +64,8 @@ public class IslandTransformer : MonoBehaviour
 
                 //Set tags into 'Front' representing the object is at front
                 hitObject.gameObject.tag = "Front";
+
+                AudioManager.instance.PlaySound(NonSpatialSound.Move);
             }
 
             else
@@ -73,6 +78,8 @@ public class IslandTransformer : MonoBehaviour
                     //Show content on island
                     if (hit.transform.TryGetComponent(out ContentController controller))
                         controller.ShowContent(true);
+
+                    AudioManager.instance.PlaySound(NonSpatialSound.Enlarge);
                 }
                 else if (hit.collider.CompareTag("Waiting"))     //swappping object
                 {
@@ -80,6 +87,8 @@ public class IslandTransformer : MonoBehaviour
 
                     //starts the animation of the swapping between the selected object and the front object
                     StartCoroutine(SwapObjects(hitObject, currentFrontObject, tempPosition));
+                    AudioManager.instance.PlaySound(NonSpatialSound.Shrink);
+                    AudioManager.instance.PlaySound(NonSpatialSound.Move);
 
                     //Set tags into 'Front' representing the object is at front
                     hitObject.gameObject.tag = "Front";
