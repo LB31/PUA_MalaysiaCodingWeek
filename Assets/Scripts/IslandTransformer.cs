@@ -62,7 +62,7 @@ public class IslandTransformer : MonoBehaviour
                 //Open Scene
                 if (hit.collider.CompareTag("Front"))
                 {
-                    StartCoroutine(SelectObject(hitObject));
+                    StartCoroutine(ScaleObjectUp(hitObject));
                 }
                 else if (hit.collider.CompareTag("Waiting"))     //swappping object
                 {
@@ -114,6 +114,7 @@ public class IslandTransformer : MonoBehaviour
 
             //the front object will move back to its original position
             frontObject.position = Vector3.MoveTowards(frontObject.position, returnPos, step);
+            StartCoroutine(ScaleObjectDown(frontObject));
 
             yield return null;
 
@@ -122,20 +123,20 @@ public class IslandTransformer : MonoBehaviour
         moving = false;
     }
 
-    //open up the front object
-    IEnumerator SelectObject(Transform selectedObj)
+    private IEnumerator ScaleObjectUp(Transform obj)
     {
-        bool scaleUp = selectedObj.localScale.x > 1 ? false : true;
-        bool condition = true;
-
-        while (condition)
+        while (obj.localScale.x < scaleChanged.x)
         {
-            condition = scaleUp ? selectedObj.localScale.x < scaleChanged.x : selectedObj.localScale.x > 1;
+            obj.localScale += Vector3.one * Time.deltaTime;
+            yield return null;
+        }
+    }
 
-            if (scaleUp)
-                selectedObj.localScale += Vector3.one * Time.deltaTime;
-            else
-                selectedObj.localScale -= Vector3.one * Time.deltaTime;
+    private IEnumerator ScaleObjectDown(Transform obj)
+    {
+        while(obj.localScale.x > 1)
+        {
+            obj.localScale -= Vector3.one * Time.deltaTime;
 
             yield return null;
         }
