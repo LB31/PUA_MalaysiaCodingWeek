@@ -1650,6 +1650,10 @@ MonoBehaviour:
   movementThreshold: 0.1
   target: {fileID: 867017900}
   scaleChanged: {x: 2, y: 2, z: 2}
+  currentFrontObject: {fileID: 2121084129}
+  firstIsland: {fileID: 1873081717}
+  secondIsland: {fileID: 343689400}
+  thirdIsland: {fileID: 904360458}
 --- !u!1 &2041232260
 GameObject:
   m_ObjectHideFlags: 0
@@ -2045,11 +2049,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 343689401}
     m_Modifications:
-    - target: {fileID: 3238514656194756575, guid: 987d7551f70b06e40b0cc0e6732911a4,
-        type: 3}
-      propertyPath: cameraTrans
-      value: 
-      objectReference: {fileID: 1326392196}
     - target: {fileID: 3680552680006208781, guid: 987d7551f70b06e40b0cc0e6732911a4,
         type: 3}
       propertyPath: m_RootOrder
