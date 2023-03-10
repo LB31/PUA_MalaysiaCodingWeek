@@ -8,6 +8,7 @@ public class IslandTransformer : MonoBehaviour
     //speed of the object
     public float speed = 6.0f;
     public float movementThreshold = 0.1f;
+    public float interactionDistance = 2;
 
     //the target position
     public Transform target;
@@ -40,7 +41,7 @@ public class IslandTransformer : MonoBehaviour
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
         //runs if the ray hits
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance))
         {
             //Click sound
             AudioManager.instance.PlaySound(NonSpatialSound.Click);
