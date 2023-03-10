@@ -30,8 +30,18 @@ public class OriginFlowConttoller : MonoBehaviour
             buttonText.text = nextText;
 
         //Deactivate current content
-        Activate(false, content[actualStep].ContentObjects);
-        Activate(false, content[actualStep].UIObjects);
+        if (actualStep == -1)
+        {
+            Activate(false, content[^1].ContentObjects);
+            Activate(false, content[^1].UIObjects);
+        }
+        else
+        {
+            Activate(false, content[actualStep].ContentObjects);
+            Activate(false, content[actualStep].UIObjects);
+
+        }
+
 
         actualStep++;
 
@@ -44,7 +54,7 @@ public class OriginFlowConttoller : MonoBehaviour
     }
     private void Restart()
     {
-        actualStep = 0;
+        actualStep = -1;
         buttonText.text = restartText;
     }
 
